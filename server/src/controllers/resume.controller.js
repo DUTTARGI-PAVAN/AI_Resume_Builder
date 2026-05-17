@@ -1,5 +1,4 @@
 import * as resumeService from '../services/resume.service.js';
-import extractTextFromPdf from '../utils/resumeParser.js';
 import * as aiService from '../services/ai.service.js';
 
 export const createResume = async (req, res, next) => {
@@ -88,6 +87,7 @@ export const uploadResume = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No PDF file uploaded.' });
     }
 
+    const { default: extractTextFromPdf } = await import('../utils/resumeParser.js');
     const extractedText = await extractTextFromPdf(req.file.buffer);
     if (!extractedText || extractedText.length < 50) {
       return res.status(400).json({ success: false, message: 'Could not extract text from PDF. Please try a different file.' });

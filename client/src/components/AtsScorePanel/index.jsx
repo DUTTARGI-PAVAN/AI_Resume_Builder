@@ -1,56 +1,62 @@
 // ============================================
 // AtsScorePanel.jsx - ATS Scoring Display
 // ============================================
-// Paste a job description, analyze ATS match,
-// and view breakdown with metrics and suggestions.
+// Analyze ATS readiness and view metric suggestions.
 // ============================================
 
 import './index.css';
 import { useState, useContext } from 'react';
 import { ResumeContext } from '../../context/ResumeContext.jsx';
 import { getAtsScore } from '../../services/aiService.js';
-import JobDescriptionInput from '../JobDescriptionInput';
 import AtsScoreCircle from '../AtsScoreCircle';
 import AtsChecklistItem from '../AtsChecklistItem';
 import SkillGapCard from '../SkillGapCard';
 import ATS_METRICS from '../../constants/atsMetrics.js';
-import { HiExclamationTriangle, HiLightBulb } from 'react-icons/hi2';
+import { HiChartBar, HiExclamationTriangle, HiLightBulb } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 function AtsScorePanel() {
-  const { resume, updateAtsScore, updateField } = useContext(ResumeContext);
-  const [jobDescription, setJobDescription] = useState(resume.jobDescription || '');
+  const { resume, updateAtsScore } = useContext(ResumeContext);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const atsScore = resume.atsScore;
 
   const handleAnalyze = async () => {
-    if (!jobDescription.trim()) {
-      toast.error('Paste a job description first');
+    if (!resume._id) {
+      toast.error('Save or upload your resume first');
       return;
     }
-    if (!resume._id) return;
 
     setIsAnalyzing(true);
     try {
-      updateField('jobDescription', jobDescription);
-      const result = await getAtsScore(resume._id, jobDescription);
+      const result = await getAtsScore(resume._id);
       updateAtsScore(result);
       toast.success('ATS analysis complete!');
     } catch (error) {
       toast.error('Failed to analyze resume');
+    } finally {
+      setIsAnalyzing(false);
     }
-    setIsAnalyzing(false);
   };
 
   return (
     <div className="p-md flex-col gap-md">
-      {/* Job Description Input */}
-      <JobDescriptionInput
-        value={jobDescription}
-        onChange={setJobDescription}
-        onAnalyze={handleAnalyze}
-        isLoading={isAnalyzing}
-      />
+      <button
+        onClick={handleAnalyze}
+        disabled={isAnalyzing}
+        className={`btn btn-primary-gradient btn-full ${isAnalyzing ? 'btn-disabled' : ''}`}
+      >
+        {isAnalyzing ? (
+          <>
+            <div className="spinner spinner-sm" />
+            Analyzing...
+          </>
+        ) : (
+          <>
+            <HiChartBar />
+            Analyze Resume
+          </>
+        )}
+      </button>
 
       {/* Loading State */}
       {isAnalyzing && (
@@ -149,7 +155,7 @@ function AtsScorePanel() {
       {!atsScore && !isAnalyzing && (
         <div className="empty-state">
           <p className="text-muted text-sm">
-            Paste a job description above and click Analyze to see your ATS score.
+            Click Analyze Resume to see your ATS score.
           </p>
         </div>
       )}

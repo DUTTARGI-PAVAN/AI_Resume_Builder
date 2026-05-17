@@ -4,6 +4,9 @@
 
 import mongoose from 'mongoose'; // Mongoose ODM (MongoDB: Database Connection)
 
+const atlasConnectionHelp =
+  'If this is a MongoDB Atlas cluster, check Network Access in Atlas and add your current IP address to the IP access list. Also verify the username, password, and cluster host in MONGODB_URI.';
+
 // Using async/await pattern (JS Essentials: Async/Await)
 const connectDB = async () => {
   try {
@@ -19,11 +22,19 @@ const connectDB = async () => {
       );
     }
 
-    const conn = await mongoose.connect(mongoURI); // Mongoose connection (MongoDB: Database Connection)
+    const conn = await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 10000,
+    }); // Mongoose connection (MongoDB: Database Connection)
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    if (
+      error.name === 'MongoServerSelectionError' ||
+      error.message.includes('MongoDB Atlas cluster')
+    ) {
+      console.error(atlasConnectionHelp);
+    }
+    throw error;
   }
 };
 

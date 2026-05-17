@@ -52,14 +52,16 @@ export const generateSummary = async (data) => {
 
 export const getAtsScore = async (data) => {
   const sections = data.sections || {};
-  const jobDescription = data.jobDescription || '';
+  const jobDescription = (data.jobDescription || '').trim();
 
   const resumeText = JSON.stringify(sections);
-  const keywordResults = analyzeKeywords(resumeText, jobDescription);
+  const keywordResults = jobDescription
+    ? analyzeKeywords(resumeText, jobDescription)
+    : null;
   const formatResults = checkFormatting(sections);
 
   const algorithmicResults = {
-    keywordMatch: keywordResults,
+    keywordMatch: keywordResults || 'No job description provided; score resume keyword richness and ATS readability instead of job-specific keyword matching.',
     formatting: formatResults.formatting || 0,
     sectionCompleteness: formatResults.sectionCompleteness || 0,
     quantification: formatResults.quantification || 0,
