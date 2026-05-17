@@ -1,17 +1,4 @@
 import { Router } from 'express';
-import { chat, getChatHistory } from '../controllers/ai.controller.js';
-import authenticate from '../middleware/auth.middleware.js';
-
-const router = Router();
-
-router.use(authenticate);
-
-router.post('/chat', chat);
-router.get('/chat-history/:resumeId', getChatHistory);
-
-export default router;
-
-import { Router } from 'express';
 import {
   chat, generateBullets, generateSummary,
   atsScore, review, matchJob, skillGaps, getChatHistory,

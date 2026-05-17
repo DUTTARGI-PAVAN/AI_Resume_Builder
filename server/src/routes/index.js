@@ -15,20 +15,6 @@
 
 import { Router } from 'express';
 import authRoutes from './auth.routes.js';
-
-// TODO: Import resume, ai, and version routes as you build them
-
-
-const router = Router();
-
-// Mount route modules
-router.use('/auth', authRoutes);           // → /api/auth/...
-
-// TODO: Mount resume, ai, and version routes as you build them
-
-export default router;
-import { Router } from 'express';
-import authRoutes from './auth.routes.js';
 import resumeRoutes from './resume.routes.js';
 import aiRoutes from './ai.routes.js';
 import versionRoutes from './version.routes.js';

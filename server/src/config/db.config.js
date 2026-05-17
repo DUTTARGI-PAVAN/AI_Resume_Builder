@@ -13,6 +13,12 @@ const connectDB = async () => {
       throw new Error('MONGODB_URI is not defined in your .env file');
     }
 
+    if (mongoURI.includes('@cluster.mongodb.net')) {
+      throw new Error(
+        'MONGODB_URI still uses the placeholder host "cluster.mongodb.net". Replace it with your real MongoDB Atlas host, for example "cluster0.xxxxx.mongodb.net", or use a local MongoDB URI.'
+      );
+    }
+
     const conn = await mongoose.connect(mongoURI); // Mongoose connection (MongoDB: Database Connection)
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
